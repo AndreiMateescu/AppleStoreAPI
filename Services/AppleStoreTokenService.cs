@@ -48,7 +48,7 @@ public class AppleStoreTokenService : IAppleStoreTokenService
 
     private ECDsa GetECDsa()
     {
-        using (TextReader reader = System.IO.File.OpenText("PRIVATE_KEY_FILE" ?? string.Empty)) //_configuration["PRIVATE_KEY_FILE"]
+        using (TextReader reader = System.IO.File.OpenText(PRIVATE_KEY_FILE ?? string.Empty)) //_configuration["PRIVATE_KEY_FILE"]
         {
             var ecPrivateKeyParameters = (ECPrivateKeyParameters)new Org.BouncyCastle.OpenSsl.PemReader(reader).ReadObject();
             var x = ecPrivateKeyParameters.Parameters.G.AffineXCoord.GetEncoded();
@@ -79,18 +79,18 @@ public class AppleStoreTokenService : IAppleStoreTokenService
 
         var payload = new Dictionary<string, object>
         {
-            { "iss", "ISSUER_ID" ?? string.Empty }, //_configuration["ISSUER_ID"]
+            { "iss", ISSUER_ID ?? string.Empty }, //_configuration["ISSUER_ID"]
             { "aud", "appstoreconnect-v1" },
             { "iat", nowSeconds },
             { "exp", expireSeconds },
-            { "bid", "BUNDLE_ID" ?? string.Empty } //_configuration["BUNDLE_ID"]
+            { "bid", BUNDLE_ID ?? string.Empty } //_configuration["BUNDLE_ID"]
         };
 
         var descriptor = new SecurityTokenDescriptor
         {
             IssuedAt = now,
             Expires = expires,
-            Issuer = "ISSUER_ID", //_configuration["ISSUER_ID"],
+            Issuer = ISSUER_ID, //_configuration["ISSUER_ID"],
             SigningCredentials = credentials,
             Claims = payload
         };
