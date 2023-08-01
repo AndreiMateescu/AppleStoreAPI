@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Subscriptions.Data;
 using Subscriptions.Helpers;
 using Subscriptions.Interfaces;
@@ -31,6 +32,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseFileServer(new FileServerOptions
+{
+    FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()),
+    RequestPath = "",
+    EnableDefaultFiles = true
+});
 
 app.UseHttpsRedirection();
 
