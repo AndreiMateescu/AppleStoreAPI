@@ -13,10 +13,10 @@ namespace Subscriptions.Services;
 
 public class AppleStoreTokenService : IAppleStoreTokenService
 {
-    // private const string KEY_ID = "74X8P3D328";
-    // private const string BUNDLE_ID = "com.bitscoffee.PhotoMarks.iOS";
-    // private const string PRIVATE_KEY_FILE = "AuthKey_74X8P3D328.p8";
-    // private const string ISSUER_ID = "69a6de79-f729-47e3-e053-5b8c7c11a4d1";
+    private const string KEY_ID = "74X8P3D328";
+    private const string BUNDLE_ID = "com.bitscoffee.PhotoMarks.iOS";
+    private const string PRIVATE_KEY_FILE = "AuthKey_74X8P3D328.p8";
+    private const string ISSUER_ID = "69a6de79-f729-47e3-e053-5b8c7c11a4d1";
 
     private readonly IConfiguration _configuration;
 
@@ -48,7 +48,7 @@ public class AppleStoreTokenService : IAppleStoreTokenService
 
     private ECDsa GetECDsa()
     {
-        using (TextReader reader = System.IO.File.OpenText(_configuration["PRIVATE_KEY_FILE"] ?? string.Empty))
+        using (TextReader reader = System.IO.File.OpenText("PRIVATE_KEY_FILE" ?? string.Empty)) //_configuration["PRIVATE_KEY_FILE"]
         {
             var ecPrivateKeyParameters = (ECPrivateKeyParameters)new Org.BouncyCastle.OpenSsl.PemReader(reader).ReadObject();
             var x = ecPrivateKeyParameters.Parameters.G.AffineXCoord.GetEncoded();
@@ -68,7 +68,7 @@ public class AppleStoreTokenService : IAppleStoreTokenService
 
     private string CreateJwt(ECDsa key)
     {
-        var securityKey = new ECDsaSecurityKey(key) { KeyId = _configuration["KEY_ID"] };
+        var securityKey = new ECDsaSecurityKey(key) { KeyId = KEY_ID }; //_configuration["KEY_ID"]
         var credentials = new SigningCredentials(securityKey, "ES256");
 
         var now = DateTime.Now;
@@ -79,18 +79,18 @@ public class AppleStoreTokenService : IAppleStoreTokenService
 
         var payload = new Dictionary<string, object>
         {
-            { "iss", _configuration["ISSUER_ID"] ?? string.Empty },
+            { "iss", "ISSUER_ID" ?? string.Empty }, //_configuration["ISSUER_ID"]
             { "aud", "appstoreconnect-v1" },
             { "iat", nowSeconds },
             { "exp", expireSeconds },
-            { "bid", _configuration["BUNDLE_ID"] ?? string.Empty }
+            { "bid", "BUNDLE_ID" ?? string.Empty } //_configuration["BUNDLE_ID"]
         };
 
         var descriptor = new SecurityTokenDescriptor
         {
             IssuedAt = now,
             Expires = expires,
-            Issuer = _configuration["ISSUER_ID"],
+            Issuer = "ISSUER_ID", //_configuration["ISSUER_ID"],
             SigningCredentials = credentials,
             Claims = payload
         };
